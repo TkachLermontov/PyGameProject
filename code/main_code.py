@@ -6,6 +6,7 @@ import pygame.freetype  # Import the freetype module.
 
 class Difficulties(pygame.sprite.Sprite):
     def __init__(self):
+        super().__init__()
         self.current_difficulty = 1
 
     def update(self, lst):
@@ -18,8 +19,8 @@ class Difficulties(pygame.sprite.Sprite):
         pygame.draw.rect(screen, (56, 37, 11), (0, 151, 50, 50), 5)
         self.draw_text(str(lst[3]), "pictures\Roboto-Regular.ttf", 45, (102, 51, 0), 12, 150)
 
-    def draw_text(self, text, font_name, size, color, x, y):
-        font = pygame.font.Font(font_name, size)
+    def draw_text(self, text, font_name, sizes, color, x, y):
+        font = pygame.font.Font(font_name, sizes)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x, y)
@@ -40,25 +41,26 @@ class Difficulties(pygame.sprite.Sprite):
 
 class Score(pygame.sprite.Sprite):
     def __init__(self):
+        super().__init__()
         pygame.draw.rect(screen, "black", (730, 0, 80, 80), 10)
         self.scr = 0
         self.lives = 0
 
     def update(self, lst):
         pygame.draw.rect(screen, "black", (730, 0, 80, 80), 10)
-        catched = 0
+        catch = 0
         misses = 0
         for i in lst:
-            if i.is_catched is True:
-                catched += 1
-            elif i.is_catched is False:
+            if i.is_catch is True:
+                catch += 1
+            elif i.is_catch is False:
                 misses += 1
-        self.scr = catched
+        self.scr = catch
         self.lives = misses
         self.draw_text(str(self.scr), "pictures\Roboto-Regular.ttf", 50, (0, 0, 0), 745, 10)
 
-    def draw_text(self, text, font_name, size, color, x, y):
-        font = pygame.font.Font(font_name, size)
+    def draw_text(self, text, font_name, sizes, color, x, y):
+        font = pygame.font.Font(font_name, sizes)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x, y)
@@ -87,10 +89,10 @@ class Gold(pygame.sprite.Sprite):
 
     def __init__(self, pos):
         super().__init__(all_sprites)
-        self.is_catched = None
+        self.is_catch = None
         self.image = pygame.transform.scale(Gold.image, (40, 30))
-        colorkey = self.image.get_at((0, 0))
-        self.image.set_colorkey(colorkey)
+        color_key = self.image.get_at((0, 0))
+        self.image.set_colorkey(color_key)
         self.image = self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = pos
@@ -98,16 +100,16 @@ class Gold(pygame.sprite.Sprite):
 
     def update(self, speed):
         if pygame.sprite.collide_mask(self, lava):
-            self.is_catched = False
+            self.is_catch = False
             self.image = pygame.transform.scale(self.fire_image, (50, 40))
-            colorkey = self.image.get_at((0, 0))
-            self.image.set_colorkey(colorkey)
+            color_key = self.image.get_at((0, 0))
+            self.image.set_colorkey(color_key)
             self.image = self.image.convert_alpha()
         elif pygame.sprite.collide_mask(self, trolley):
-            self.is_catched = True
+            self.is_catch = True
             self.rect.x = 1000
             self.rect.y = 1000
-        if self.is_catched is None:
+        if self.is_catch is None:
             self.rect.y += 2
 
 
@@ -116,8 +118,8 @@ class Trolley(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__(all_sprites)
-        colorkey = self.image.get_at((0, 0))
-        self.image.set_colorkey(colorkey)
+        color_key = self.image.get_at((0, 0))
+        self.image.set_colorkey(color_key)
         self.image = pygame.transform.scale(self.image, (160, 110))
         self.image = self.image.convert_alpha()
         self.speed = 0
@@ -239,6 +241,10 @@ if __name__ == '__main__':
             if win.rect.x != 0:
                 win.update()
         else:
+            if trolley.rect.x == 0:
+                v += trolley_speed
+            elif trolley.rect.x == 640:
+                v -= trolley_speed
             all_sprites.update(v)
             score.update(gold_list)
             difficulties.update(difficulty_list)
